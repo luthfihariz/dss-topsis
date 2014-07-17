@@ -52,7 +52,7 @@ class UserController extends \BaseController {
 		}else{
 			$user = new User();
 			$user->username = Input::get('username');
-			$user->password = Crypt::encrypt(Input::get('password'));
+			$user->password = Hash::make(Input::get('password'));
 			$user->email = Input::get('email');
 			$user->roles = Input::get('role');
 			$user->save();

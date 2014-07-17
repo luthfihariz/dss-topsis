@@ -26,7 +26,6 @@ class LoginController extends \BaseController {
 					->withErrors($validator)
 					->withInput(Input::except('password'));
 		}else{
-
 			$userdata = array(
 				'username' => Input::get('username'),
 				'password' => Input::get('password')
@@ -35,7 +34,9 @@ class LoginController extends \BaseController {
 			if(Auth::attempt($userdata)){
 				return Redirect::intended('/');
 			}else{
-				return Redirect::to('login');
+				return Redirect::to('login')
+						->withErrors(array('password' => 'Invalid username or password.'))
+						->withInput(Input::except('password'));
 			}
 		}
 	}
