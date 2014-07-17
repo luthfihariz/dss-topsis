@@ -18,8 +18,10 @@
 
 		@foreach($configs as $config)
 			<div class="form-group">
+				@if($config->key != 'latest_topsis_calculation')
 				{{ Form::label($config->key, $config->displayed_key) }}
 				{{ Form::input('number', $config->key, $config->value, array('class' => 'form-control')) }}
+				@endif
 			</div>
 		@endforeach
 

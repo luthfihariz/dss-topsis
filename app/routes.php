@@ -18,10 +18,24 @@
 */
 /*Route::get('/', 'HomeController@showWelcome');
 Route::get('users','UserController');*/
-Route::resource('/', 'DashboardController');
-Route::resource('getData', 'DashboardController@getdata');
-Route::resource('updateSolution', 'DashboardController@updateSolution');
-Route::resource('warga', 'WargaController');
-Route::resource('kriteria', 'KriteriaController');
-Route::resource('config', 'ConfigController');
-Route::resource('user', 'UserController');
+Route::group(array('before' => 'auth'), function(){
+	if(Auth::check()){
+		if(Auth::user()->roles == 1){
+			Route::resource('user', 'UserController');
+			Route::resource('config', 'ConfigController');
+		}
+		if(Auth::user()->roles == 1 || Auth::user()->roles == 2){
+			Route::resource('kriteria', 'KriteriaController');
+			Route::resource('report', 'DashboardController@printReport');
+			Route::resource('tickets', 'DashboardController@printTickets');
+		}				
+	}	
+	Route::resource('/', 'DashboardController');
+	Route::resource('getData', 'DashboardController@getdata');
+	Route::resource('updateSolution', 'DashboardController@updateSolution');	
+	Route::resource('warga', 'WargaController');	
+	Route::resource('logout', 'LoginController@doLogout');
+});
+
+Route::resource('login', 'LoginController');
+Route::post('login', array('uses' => 'LoginController@doLogin'));

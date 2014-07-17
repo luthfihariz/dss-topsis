@@ -84,9 +84,11 @@ class ConfigController extends \BaseController {
 			->withInput(Input::except('password'));
 		}else{
 			$configs = Konfigurasi::all();
-			foreach ($configs as $key => $config) {					
-				$config->value = Input::get($config->key);
-				$config->save();
+			foreach ($configs as $key => $config) {
+				if($config->key != 'latest_topsis_calculation'){
+					$config->value = Input::get($config->key);
+					$config->save();
+				}				
 			}
 			Session::flash('message', 'Konfigurasi telah disimpan.');
 			return Redirect::to('config');

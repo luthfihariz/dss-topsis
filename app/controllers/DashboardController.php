@@ -14,21 +14,21 @@ class DashboardController extends \BaseController {
 		$latest_updated = Konfigurasi::where('key', '=', 
 			'latest_topsis_calculation')->first();	
 
-		$data = $this->getData();
+		$warga = Warga::where('solution','>','0')->orderBy('solution','desc')
+		->take($quota->value)->get();		
+		$numOfWarga = Warga::all()->count();		
 
 		return View::make('index')
 		->with('quota', $quota)
 		->with('latest_updated', $latest_updated)
-		->with('numOfCitizen', $data['numOfCitizen'])
-		->with('calculatedCitizens', $data['calculated'])
-		->with('unCalculatedCitizens', $data['uncalculated']);
+		->with('numOfCitizen', $numOfWarga)
+		->with('citizens', $warga);		
 	}
 
 	public function getData(){
 		
-		$warga = Warga::where('solution','>','0.1');
+		$warga = Warga::with('nilai.kriteria')->get();
 		$numOfKriteria = Kriteria::all()->count();
-		$numOfWarga = count($warga);
 
 		$inArrayAllWarga = Array();		
 		foreach ($warga as $i => $war) {			
@@ -55,14 +55,12 @@ class DashboardController extends \BaseController {
 			}else{
 				array_push($unCalculatedData, $war);
 			}
-		}		
-
+		}
 
 		return array(
-				'numOfCitizen' => $numOfWarga,
-				'calculated' => $calculatedData,
-				'uncalculated' => $unCalculatedData
-				);
+			'calculated' => $calculatedData,
+			'uncalculated' => $unCalculatedData
+			);
 	}
 
 	
@@ -81,7 +79,18 @@ class DashboardController extends \BaseController {
 		return "success updating";
 	}
 
-	
+		
+	public function printReport()
+	{
+		$pdf = App::make('dompdf');
+		$pdf->loadHTML('<h1>Test</h1>');
+		return $pdf->stream();
+	}
+
+	public function printTickets()
+	{
+
+	}
 
 	/**
 	 * Show the form for creating a new resource.

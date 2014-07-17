@@ -4,8 +4,7 @@ class Warga extends Eloquent {
 
 	protected $table = 'warga';
 	public $timestamps = true;
-	protected $softDelete = false;
-	protected $with = array('nilai.kriteria');
+	protected $softDelete = false;	
 
 	public function nilai()
 	{

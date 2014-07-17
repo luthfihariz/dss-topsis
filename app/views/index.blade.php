@@ -1,18 +1,14 @@
 @extends('layout')
-
 @section('content')
+
+<script src='js/pdfmake.min.js'></script>
+<script src='js/vfs_fonts.js'></script>
 <link href="css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
 <link href="css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
 <div class="col-md-12">
 	<h2 class="page-header">Dashboard</h2>
 	<div class="row">	
-		<div class="col-md-8">						
-
-			<div class="progress progress-striped active" id="barcontainer">
-  				<div id="progressbar" class="progress-bar" role="progressbar" 
-  				aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-			  	</div>
-			</div>
+		<div class="col-md-8">												
 
 			<p class="pull-right">
 				<button type="button" class="btn btn-primary" id="calculate">Perbaharui Kalkulasi</button>
@@ -20,11 +16,36 @@
 			<p class="pull-left">
 				Terakhir dilakukan kalkulasi pada : <b>{{$latest_updated->value}}</b>
 			</p>
+
 			<div class="clear"></div>
+			@if(count($citizens) < $quota->value)
+				<div class="alert alert-warning">
+  				<button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+  					Terdapat <b>{{ ($quota->value - count($citizens)) }}</b> kuota raskin belum terbagi. Perbaharui kalkulasi untuk memutakhirkan data.
+	    		</div>
+			@endif
 			
 			<div class="panel panel-default">
-				<div class="panel-heading">Berhak Raskin</div>
-				<div class="panel-body">
+				<div class="panel-heading">
+					<i class="fa fa-user fa-fw"></i> <b>Berhak Raskin</b>
+
+					<div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#" id="report">Cetak Laporan</a>
+                                        </li>
+                                        <li><a href="{{URL::to('tickets')}}">Cetak Tiket</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+				</div>
+				<div class="panel-body" id="result-container">
 					
 					<table class="table table-striped table-bordered table-hover" id="result">
 						<thead>
@@ -38,7 +59,7 @@
 							</tr>		
 						</thead>
 						<tbody>
-							@foreach($calculatedCitizens as $key => $citizen)
+							@foreach($citizens as $key => $citizen)
 							<tr>
 								<td>{{$key+1}}</td>
 								<td>{{$citizen['nama_krt']}}</td>
@@ -65,16 +86,7 @@
 								<td>Nama Pasangan KRT</td>
 							</tr>		
 						</thead>
-						<tbody>
-							@foreach($unCalculatedCitizens as $key => $citizen)
-							<tr>
-								<td>{{$key+1}}</td>
-								<td>{{$citizen['nama_krt']}}</td>
-								<td>{{$citizen['no_kk']}}</td>
-								<td>{{$citizen['no_kps']}}</td>
-								<td>{{$citizen['nama_pasangan_krt']}}</td>
-							</tr>							
-							@endforeach
+						<tbody>							
 						</tbody>
 					</table>
 				</div>
@@ -83,11 +95,10 @@
 		<div class="col-md-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
+					<i class="fa fa-bar-chart-o fa-fw"></i> Pembagian Raskin
 				</div>
 				<div class="panel-body">
 					<div id="morris-donut-chart"></div>
-					<a href="#" class="btn btn-default btn-block">View Details</a>
 				</div>
 				<!-- /.panel-body -->
 			</div>
@@ -102,13 +113,13 @@
 <script src="js/plugins/morris/raphael-2.1.0.min.js"></script>
 <script src="js/plugins/morris/morris.js"></script>
 
+
+
 <script type="text/javascript">
 		
 	var quota = "{{$quota->value}}";
 	var startTime = new Date().getTime();
-	var dataTable;
-	var calculatedCitizens = '{{json_encode($calculatedCitizens)}}';	
-
+	var dataTable;	
 
 	Morris.Donut({
         element: 'morris-donut-chart',
@@ -122,24 +133,97 @@
         resize: true
     });
 
-	jQuery("#calculate").click(function(){
-		jQuery("#result tbody").html("");
-		jQuery.ajax({
+    jQuery("#report").click(function(){
+    	
+    	printReport(null);
+    	/*jQuery.ajax({
 			url : "{{ URL::to('getData') }}",
-			type : "GET",			
-			success : function(data){															
-				console.log("starting calculation...");
+			type : "GET",
+			beforeSend: function(data){
+				setLoader(true);
+				jQuery("#result tbody").html("");
+			},
+			success : function(data){				
+				console.log("starting calculation... size : "+data.calculated.length);
 				result = doTopsis(data.calculated);
 				console.log("updating solution...");
 				updateSolution(result);
 				console.log("showing result..");
-				showTopsisResult(result);				
+				showTopsisResult(result);
+				printReport(result);
+				setLoader(false);
+			},
+			error: function(data){
+				console.log(data);
+			}		
+		});*/
+    	
+    });
+
+    function printReport(data){
+    	console.log("print report");
+    	/*var pdf = new jsPDF('p','pt','letter');*/
+    	/*html = "<html><head></head><body>"
+    	var html = "<h1>Sistem Pendukung Keputusan Kelayakan Penerima Bantuan RASKIN asdjajshgjasdg jasdhkahsdkas djashdkjahskda</h1>";
+    	html += "<table style='width:100%'><colgroup><colwidth='9%'><colwidth='13%'><colwidth='13%'> <colwidth='13%'> <colwidth='13%'> <colwidth='13%'> <colwidth='13%'> <colwidth='13%'> </colgroup>";
+    	html += "<thead><tr><th>No</th><th>Nomor KK</th><th>Nama KRT</th><th>Nama Pasangan KRT</th><th>Kelurahan/Desa</th><th>RT</th><th>RW</th><th>Bobot Kelayakan</th></tr></thead><tbody>";
+		$.each(data, function(index, singleData){
+			html += "<tr>";
+			html += "<td>"+(index+1)+"</td>";
+			html += "<td>"+(singleData.no_kk)+"</td>";
+			html += "<td>"+(singleData.nama_krt)+"</td>";
+			html += "<td>"+(singleData.nama_pasangan_krt)+"</td>";
+			html += "<td>"+(singleData.kelurahan_desa)+"</td>";			
+			html += "<td>"+(singleData.rt)+"</td>";
+			html += "<td>"+(singleData.rw)+"</td>";
+			html += "<td>"+(singleData.solution)+"</td>";
+			html += "</tr>";
+		});
+		html += "</tbody></table></body></html>"	*/
+		
+		var fonts = {
+			Roboto: {
+				normal: 'fonts/Roboto-Regular.ttf',
+				bold: 'fonts/Roboto-Medium.ttf',
+				italics: 'fonts/Roboto-Italic.ttf',
+				bolditalics: 'fonts/Roboto-Italic.ttf'
+			}
+		};		
+
+		var docDefinition = {
+			content: [
+				'First paragraph',
+				'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
+			]
+		};
+
+		pdfMake.createPdf(docDefinition).download('asd.pdf');
+
+    }
+
+	jQuery("#calculate").click(function(){		
+		jQuery.ajax({
+			url : "{{ URL::to('getData') }}",
+			type : "GET",
+			beforeSend: function(data){
+				setLoader(true);
+				jQuery("#result tbody").html("");
+			},
+			success : function(data){				
+				console.log("starting calculation... size : "+data.calculated.length);
+				result = doTopsis(data.calculated);
+				console.log("updating solution...");
+				updateSolution(result);
+				console.log("showing result..");
+				showTopsisResult(result);
+				setLoader(false);
 			},
 			error: function(data){
 				console.log(data);
 			}		
 		});
 	});
+
 	
 	function doTopsis(data){
 
@@ -338,7 +422,6 @@
 		jQuery("#result tbody").html(html);
 		//dataTable = jQuery("#result").DataTable({"lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
 			
-
 		updateProgressBar("100%");		
 	}
 
@@ -380,12 +463,22 @@
 		}			
 	}
 
+	function setLoader(isShown){
+		if(isShown){
+			jQuery("#loader").show();
+			jQuery("#loader").text("Proses ini akan memakan waktu beberapa menit.");
+		}else{
+			jQuery("#loader").hide();
+		}
+	}
+
 	function updateProgressBar(progress){
 		jQuery("#progressbar").css({width:progress});		
 		if(progress=="100%"){
-			jQuery("#barcontainer").removeClass('active').delay(500).fadeOut(100)
-		}
-		
+			jQuery("#barcontainer").removeClass('active').delay(500).fadeOut(100);
+		}else if(progress="0%"){
+			jQuery("#barcontainer").addClass('active').delay(500).fadeIn(100);
+		}		
 	}
 	
 </script>
