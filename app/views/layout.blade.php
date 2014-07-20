@@ -25,7 +25,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">Sistem Penunjang Keputusan</a>
+                <a class="navbar-brand" href="{{URL::to('/')}}">Sistem Pendukung Keputusan Kelayakan Penerima Bantuan RASKIN</a>
             </div>
             <!-- /.navbar-header -->
 

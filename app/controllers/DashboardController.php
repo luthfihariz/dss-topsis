@@ -75,15 +75,22 @@ class DashboardController extends \BaseController {
 		date_default_timezone_set('Asia/Jakarta');
 		Konfigurasi::where('key','=','latest_topsis_calculation')
 		->update(array('value' => date('l, d F Y H:i:s')));
-
 		return "success updating";
 	}
 
 		
 	public function printReport()
 	{
+		/*$data = $_POST['data'];
+		
 		$pdf = App::make('dompdf');
-		$pdf->loadHTML('<h1>Test</h1>');
+		foreach ($data as $key => $singleData) {
+			$pdf->loadHTML($singleData['nama_krt']);
+		}*/
+
+		$pdf = App::make('dompdf');
+		$pdf->loadHTML("<h1>Test brot</h1>");
+		
 		return $pdf->stream();
 	}
 
