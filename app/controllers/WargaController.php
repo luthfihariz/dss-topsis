@@ -10,8 +10,9 @@ class WargaController extends \BaseController {
 	public function index()
 	{
 		$warga = Warga::paginate(10);
+		$count = Warga::count();
 		$kriteria = Kriteria::all();
-		return View::make('warga.index')->with('semuaWarga', $warga)->with('kriteria', $kriteria);
+		return View::make('warga.index')->with('semuaWarga', $warga)->with('kriteria', $kriteria)->with('count', $count);
 	}
 
 

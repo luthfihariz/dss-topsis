@@ -55,7 +55,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'dummy_dev',
+			'database'  => 'db_raskin',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',

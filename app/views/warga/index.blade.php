@@ -10,9 +10,11 @@
 		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
     	Data warga telah dihapus.
 	</div>
+	<b>Jumlah Warga : {{ $count }}</b>
 	<div class="row">
 		<div class="col-md-7">
 			{{ $semuaWarga->links() }}
+
 		</div>
 		<div class="col-md-5">
 			<div class="pull-right">
@@ -22,6 +24,7 @@
 	</div>
 
 	<table class="table table-striped table-bordered table-hover" id="wargaTable">
+
 		<thead>
 			<tr>
 				<td>No</td>
