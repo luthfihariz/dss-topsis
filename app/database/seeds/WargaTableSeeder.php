@@ -6,7 +6,7 @@ class WargaTableSeeder extends Seeder{
 
 		DB::table('warga')->delete();		
 
-		for ($i=0; $i < 1000; $i++) { 
+		for ($i=0; $i < 200; $i++) { 
 			
 			$warga = new Warga();
 			$warga->nama_krt = "Pak Anu".$i;

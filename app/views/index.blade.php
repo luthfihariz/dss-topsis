@@ -59,18 +59,23 @@
 								<td>Nomor KPS</td>
 								<td>Nama Pasangan KRT</td>
 								<td>Bobot Kelayakan</td>
+								<td></td>
 							</tr>		
 						</thead>
 						<tbody>
 							@foreach($citizens as $key => $citizen)
-							<tr>
+							
+							
+							<tr>								
 								<td>{{$key+1}}</td>
 								<td>{{$citizen['nama_krt']}}</td>
 								<td>{{$citizen['no_kk']}}</td>
 								<td>{{$citizen['no_kps']}}</td>
 								<td>{{$citizen['nama_pasangan_krt']}}</td>
-								<td>{{number_format($citizen['solution'],4,'.','')}}</td>
-							</tr>							
+								<td>{{number_format($citizen['solution'],4,'.','')}}</td>								
+								<td><a class="btn btn-small btn-info btn-outline" href="{{ URL::to('warga/'.$citizen['id']) }}">Detail</a></td>
+							</tr>
+							
 							@endforeach
 						</tbody>
 					</table>
@@ -448,6 +453,7 @@
 						"<td>"+singleCitizen.no_kps+"</td>"+
 						"<td>"+singleCitizen.nama_pasangan_krt+"</td>"+
 						"<td>"+(parseFloat(Math.round(singleCitizen.solution * 10000) / 10000).toFixed(4))+"</td>"+
+						"<td> <a class='btn btn-small btn-info btn-outline' href={{ URL::to('warga') }}/"+singleCitizen.id+">Detail</a></td>"+
 					"</tr>";
 		});
 		jQuery("#result tbody").html(html);			
@@ -484,7 +490,7 @@
 							"<td>"+singleCitizen.no_kk+"</td>"+
 							"<td>"+singleCitizen.no_kps+"</td>"+
 							"<td>"+singleCitizen.nama_pasangan_krt+"</td>"+
-						"</tr>";
+						"</tr></a>";
 			});
 			jQuery("#uncalculated tbody").html(html);
 			jQuery("#uncalculated").dataTable();
